@@ -12,6 +12,7 @@ protected:
     bool active;
 
 public:
+    bool bullets;
     int score;
 
     Frog(float _x, float _y, float _width, float _height, int _score);
