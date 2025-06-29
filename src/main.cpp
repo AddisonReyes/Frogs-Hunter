@@ -59,12 +59,23 @@ int main()
     const Color bkgColor = {88, 225, 246, 255};
 
     InitWindow(screenWidth, screenHeight, "Frogs Hunter!");
+    InitAudioDevice();
     SetTargetFPS(60);
 
     Player player(10);
     GameState currentGameState = GAMEPLAY;
 
-    std::vector<FloatingText> floatingTexts;
+    Music themeSong = LoadMusicStream("src/assets/audio/theme.wav");
+    Sound frogAudio = LoadSound("src/assets/audio/frog.wav");
+    Sound gameOverAudio = LoadSound("src/assets/audio/gameOver.wav");
+
+    SetMusicVolume(themeSong, 0.5f);
+
+    SetSoundVolume(gameOverAudio, 0.5f);
+    SetSoundVolume(frogAudio, 0.5f);
+
+    std::vector<FloatingText>
+        floatingTexts;
     std::vector<Frog> frogs;
     int numOfFrogs = 10;
 
@@ -81,10 +92,18 @@ int main()
     while (!WindowShouldClose())
     {
         float deltaTime = GetFrameTime();
+        UpdateMusicStream(themeSong);
+
         switch (currentGameState)
         {
         case GAMEPLAY:
         {
+            if (!IsMusicStreamPlaying(themeSong))
+            {
+                SeekMusicStream(themeSong, 0.0f);
+                PlayMusicStream(themeSong);
+            }
+
             /*
              * Update
              */
@@ -106,6 +125,7 @@ int main()
             if (player.getMunition() <= 0)
             {
                 currentGameState = GAMEOVER;
+                PlaySound(gameOverAudio);
             }
 
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && player.getMunition() > 0)
@@ -163,6 +183,7 @@ int main()
                             player.kill();
                         }
 
+                        PlaySound(frogAudio);
                         break;
                     }
                 }
@@ -197,6 +218,11 @@ int main()
 
         case GAMEOVER:
         {
+            if (IsMusicStreamPlaying(themeSong))
+            {
+                PauseMusicStream(themeSong);
+            }
+
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
             {
                 Vector2 mousePoint = GetMousePosition();
@@ -274,6 +300,11 @@ int main()
         EndDrawing();
     }
 
+    UnloadMusicStream(themeSong);
+    UnloadSound(gameOverAudio);
+    UnloadSound(frogAudio);
+
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }
