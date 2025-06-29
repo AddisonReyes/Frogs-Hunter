@@ -12,14 +12,24 @@ Frog::Frog(float _x, float _y, float _width, float _height, int _score)
     score = _score;
 }
 
+double Frog::speed = 0.6;
+
 void Frog::draw()
 {
     if (active)
     {
         Color color;
-        if (isFrog)
+        if (goldFrog)
+        {
+            color = YELLOW;
+        }
+        else if (isFrog && !bullets)
         {
             color = GREEN;
+        }
+        else if (bullets)
+        {
+            color = BROWN;
         }
         else
         {
@@ -31,9 +41,42 @@ void Frog::draw()
 
 void Frog::update()
 {
+    x += speed + aditionalSpeed;
+}
+
+void Frog::moreSpeed()
+{
+    if (speed < 10)
+    {
+        speed += 0.03;
+    }
+}
+
+void Frog::lessSpeed()
+{
+    if (speed > 2)
+    {
+        speed -= 0.03;
+    }
 }
 
 void Frog::changeToType(bool _isFrog)
 {
     isFrog = _isFrog;
+}
+
+void Frog::die(bool moreDificulty)
+{
+    active = false;
+    if (isFrog)
+    {
+        if (moreDificulty)
+        {
+            moreSpeed();
+        }
+        else
+        {
+            lessSpeed();
+        }
+    }
 }

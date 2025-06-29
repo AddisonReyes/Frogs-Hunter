@@ -5,6 +5,7 @@ class Player
 {
 protected:
     int munition;
+    int frogsKilled;
     int score;
 
 public:
@@ -14,6 +15,8 @@ public:
 
     int getScore() const { return score; }
     int getMunition() const { return munition; }
+    int getFrogsKilled() const { return frogsKilled; }
+    void kill();
 };
 
 #endif

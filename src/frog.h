@@ -6,24 +6,29 @@
 class Frog
 {
 protected:
-    float x, y;
-    float width, height;
     bool isFrog;
     bool active;
 
 public:
+    static double speed;
+    double aditionalSpeed;
+    float width, height;
+    bool goldFrog;
     bool bullets;
+    float x, y;
     int score;
 
     Frog(float _x, float _y, float _width, float _height, int _score);
 
+    void die(bool moreDificulty);
     void draw();
     void update();
+    void moreSpeed();
+    void lessSpeed();
     void changeToType(bool _isFrog);
 
     bool getIsFrog() const { return isFrog; }
     bool isActive() const { return active; }
-    void setActive(bool state) { active = state; }
 
     Rectangle getRect() const { return {x, y, width, height}; }
 };
