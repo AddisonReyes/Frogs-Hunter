@@ -23,9 +23,11 @@ public:
     void die(bool moreDificulty);
     void draw();
     void update();
+    void changeToType(bool _isFrog);
+
     void moreSpeed();
     void lessSpeed();
-    void changeToType(bool _isFrog);
+    static void resetSpeed();
 
     bool getIsFrog() const { return isFrog; }
     bool isActive() const { return active; }

@@ -80,3 +80,8 @@ void Frog::die(bool moreDificulty)
         }
     }
 }
+
+void Frog::resetSpeed()
+{
+    speed = 0.6;
+}
