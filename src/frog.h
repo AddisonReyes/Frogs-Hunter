@@ -6,12 +6,14 @@
 class Frog
 {
 protected:
+    Texture2D sprite;
+    Texture2D lilyPad;
+    bool spriteLoaded;
     bool isFrog;
     bool active;
 
 public:
     static double speed;
-    double aditionalSpeed;
     float width, height;
     bool goldFrog;
     bool bullets;

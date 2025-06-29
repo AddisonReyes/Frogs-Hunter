@@ -10,6 +10,7 @@ Frog::Frog(float _x, float _y, float _width, float _height, int _score)
     isFrog = true;
     active = true;
     score = _score;
+    spriteLoaded = false;
 }
 
 double Frog::speed = 0.6;
@@ -18,30 +19,40 @@ void Frog::draw()
 {
     if (active)
     {
-        Color color;
-        if (goldFrog)
+        if (!spriteLoaded)
         {
-            color = YELLOW;
+            lilyPad = LoadTexture("src/assets/sprites/lily_pad.png");
+            // Color color;
+            if (goldFrog)
+            {
+                sprite = LoadTexture("src/assets/sprites/frog3.png");
+                // color = YELLOW;
+            }
+            else if (isFrog && !bullets)
+            {
+                sprite = LoadTexture("src/assets/sprites/frog1.png");
+                // color = GREEN;
+            }
+            else if (bullets)
+            {
+                sprite = LoadTexture("src/assets/sprites/frog2.png");
+                // color = BROWN;
+            }
+            else
+            {
+                // color = GRAY;
+            }
+            spriteLoaded = true;
+            // DrawRectangle(x, y, width, height, color);
         }
-        else if (isFrog && !bullets)
-        {
-            color = GREEN;
-        }
-        else if (bullets)
-        {
-            color = BROWN;
-        }
-        else
-        {
-            color = GRAY;
-        }
-        DrawRectangle(x, y, width, height, color);
+        DrawTexture(lilyPad, x, y + 10, WHITE);
+        DrawTexture(sprite, x, y, WHITE);
     }
 }
 
 void Frog::update()
 {
-    x += speed + aditionalSpeed;
+    x += speed;
 }
 
 void Frog::moreSpeed()

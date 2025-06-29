@@ -61,5 +61,6 @@
 		"typeinfo": "cpp",
 		"variant": "cpp",
 		"*.m": "cpp"
-	}
+	},
+	"C_Cpp.errorSquiggles": "disabled"
 }

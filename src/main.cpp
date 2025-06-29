@@ -1,48 +1,18 @@
 #include "frog.h"
 #include "player.h"
+#include "utils.h"
 
-#include <algorithm>
 #include <raylib.h>
 #include <iostream>
-#include <random>
 #include <vector>
 
 const int screenHeight = 600;
 const int screenWidth = 800;
 const int fontSize = 32;
 
-enum GameState
-{
-    GAMEPLAY,
-    GAMEOVER
-};
-
-double randomInRange(double min, double max)
-{
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(min, max);
-    return dis(gen);
-}
-
-double munitionProb(int bullets)
-{
-    double minProb = 0.01;
-    double maxProb = 0.30;
-    int minMunition = 1;
-    int maxMunition = 15;
-
-    double probability = maxProb - ((maxProb - minProb) * (bullets - minMunition) / (maxMunition - minMunition));
-
-    probability = std::max(minProb, std::min(maxProb, probability));
-
-    return probability;
-}
-
 void spawnFrog(std::vector<Frog> *frogs, int bullets)
 {
-    Frog frog(randomInRange(-100, -300), randomInRange(60, screenHeight - 120), 64, 64, 5);
-    frog.aditionalSpeed = randomInRange(0, 1);
+    Frog frog(randomInRange(-100, -600), randomInRange(60, screenHeight - 120), 64, 64, 5);
     frog.goldFrog = false;
     frog.bullets = false;
 
@@ -69,13 +39,14 @@ void spawnFrog(std::vector<Frog> *frogs, int bullets)
     frogs->push_back(frog);
 }
 
-void ResetGame(Player *player, std::vector<Frog> *frogs, int numOfFrogs)
+void ResetGame(Player *player, std::vector<Frog> *frogs, int numOfFrogs, std::vector<FloatingText> *texts)
 {
     player->setMunition(10);
     player->setScore(0);
     player->setFrogsKilled(0);
 
     frogs->clear();
+    texts->clear();
     Frog::resetSpeed();
     for (int i = 0; i < numOfFrogs; i++)
     {
@@ -93,6 +64,7 @@ int main()
     Player player(10);
     GameState currentGameState = GAMEPLAY;
 
+    std::vector<FloatingText> floatingTexts;
     std::vector<Frog> frogs;
     int numOfFrogs = 10;
 
@@ -102,13 +74,13 @@ int main()
     }
 
     Rectangle retryButton = {(float)screenWidth / 2 - 130, (float)screenHeight / 2 + 50, 260, 60};
-    const char *retryText = "Volver a Jugar";
+    const char *retryText = "Play again";
     int retryTextFontSize = 30;
     int retryTextWidth = MeasureText(retryText, retryTextFontSize);
 
     while (!WindowShouldClose())
     {
-
+        float deltaTime = GetFrameTime();
         switch (currentGameState)
         {
         case GAMEPLAY:
@@ -126,6 +98,11 @@ int main()
                 }
             }
 
+            for (auto &text : floatingTexts)
+            {
+                text.update(deltaTime);
+            }
+
             if (player.getMunition() <= 0)
             {
                 currentGameState = GAMEOVER;
@@ -141,6 +118,37 @@ int main()
                     if (frog.isActive() && CheckCollisionPointRec(mousePoint, frog.getRect()))
                     {
                         hitSomething = true;
+
+                        Color textColor = WHITE;
+                        if (frog.getIsFrog())
+                        {
+                            textColor = (frog.score > 0) ? GOLD : RED;
+                            if (frog.bullets)
+                            {
+                                textColor = BLUE;
+                            }
+                        }
+                        else
+                        {
+                            textColor = GRAY;
+                        }
+
+                        floatingTexts.emplace_back(
+                            (Vector2){frog.x + frog.width / 2, frog.y + frog.height / 2}, // Position: center of the frog
+                            frog.score,
+                            textColor,
+                            1.5f // Duration of 1.5 seconds
+                        );
+                        if (frog.bullets)
+                        {
+                            floatingTexts.emplace_back(
+                                (Vector2){frog.x + frog.width / 2, (frog.y + frog.height / 2) - 20}, // Position: center of the frog
+                                5,
+                                BROWN,
+                                1.5f // Duration of 1.5 seconds
+                            );
+                        }
+
                         player.shot(frog.score);
                         spawnFrog(&frogs, player.getMunition());
                         frog.die(true);
@@ -161,8 +169,13 @@ int main()
 
                 if (!hitSomething)
                 {
-                    std::cout << "¡Clic en el agua! (nada tocado)" << std::endl;
                     player.shot(-1);
+                    Vector2 mousePoint = GetMousePosition();
+                    floatingTexts.emplace_back(
+                        mousePoint,
+                        -1,
+                        GRAY,
+                        1.5f);
                 }
             }
 
@@ -172,6 +185,13 @@ int main()
                     frogs.end(), [](const Frog &frog)
                     { return !frog.isActive(); }),
                 frogs.end());
+
+            floatingTexts.erase(
+                std::remove_if(
+                    floatingTexts.begin(),
+                    floatingTexts.end(), [](const FloatingText &text)
+                    { return text.isFinished(); }),
+                floatingTexts.end());
         }
         break;
 
@@ -182,7 +202,7 @@ int main()
                 Vector2 mousePoint = GetMousePosition();
                 if (CheckCollisionPointRec(mousePoint, retryButton))
                 {
-                    ResetGame(&player, &frogs, numOfFrogs);
+                    ResetGame(&player, &frogs, numOfFrogs, &floatingTexts);
                     currentGameState = GAMEPLAY;
                 }
             }
@@ -217,6 +237,13 @@ int main()
             DrawRectangle(0, screenHeight - 50, screenWidth, 50, BLACK);
             DrawText(scoreText.c_str(), scorePositionX, 10, fontSize, WHITE);
             DrawText(bulletsText.c_str(), bulletsPositionX, screenHeight - fontSize - 10, fontSize, WHITE);
+
+            for (auto &text : floatingTexts)
+            {
+                std::string valueStr = ((text.value > 0) ? "+" : "") + std::to_string(text.value);
+                int textWidth = MeasureText(valueStr.c_str(), 20);
+                DrawText(valueStr.c_str(), text.position.x - textWidth / 2, text.position.y, 20, text.getCurrentColor());
+            }
         }
         break;
 
@@ -232,7 +259,7 @@ int main()
             int finalScoreTextWidth = MeasureText(finalScoreText.c_str(), fontSize);
             DrawText(finalScoreText.c_str(), (screenWidth / 2) - (finalScoreTextWidth / 2), screenHeight / 2 - 20, fontSize, WHITE);
 
-            std::string frogsKilledText = "Ranas Cazadas: " + std::to_string(player.getFrogsKilled());
+            std::string frogsKilledText = "Frogs: " + std::to_string(player.getFrogsKilled());
             int frogsKilledTextWidth = MeasureText(frogsKilledText.c_str(), fontSize);
             DrawText(frogsKilledText.c_str(), (screenWidth / 2) - (frogsKilledTextWidth / 2), screenHeight / 2 + 10, fontSize, WHITE);
 
