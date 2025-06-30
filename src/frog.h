@@ -13,7 +13,12 @@ protected:
     bool active;
 
 public:
+    static Texture2D frog2Texture;
+    static Texture2D frog1Texture;
+    static Texture2D frog3Texture;
+    static Texture2D lily_padTexture;
     static double speed;
+
     float width, height;
     bool goldFrog;
     bool bullets;

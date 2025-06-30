@@ -58,8 +58,8 @@ double munitionProb(int bullets)
 {
     double minProb = 0.01;
     double maxProb = 0.30;
-    int minMunition = 1;
-    int maxMunition = 15;
+    int minMunition = 2;
+    int maxMunition = 20;
 
     double probability = maxProb - ((maxProb - minProb) * (bullets - minMunition) / (maxMunition - minMunition));
 

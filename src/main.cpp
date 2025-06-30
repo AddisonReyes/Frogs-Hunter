@@ -10,6 +10,9 @@ const int screenHeight = 600;
 const int screenWidth = 800;
 const int fontSize = 32;
 
+extern void InitFrogTextures();
+extern void UnloadFrogTextures();
+
 void spawnFrog(std::vector<Frog> *frogs, int bullets)
 {
     Frog frog(randomInRange(-100, -600), randomInRange(60, screenHeight - 120), 64, 64, 5);
@@ -62,12 +65,14 @@ int main()
     InitAudioDevice();
     SetTargetFPS(60);
 
+    InitFrogTextures();
+
     Player player(10);
     GameState currentGameState = GAMEPLAY;
 
-    Music themeSong = LoadMusicStream("src/assets/audio/theme.wav");
-    Sound frogAudio = LoadSound("src/assets/audio/frog.wav");
-    Sound gameOverAudio = LoadSound("src/assets/audio/gameOver.wav");
+    Music themeSong = LoadMusicStream("assets/audio/theme.wav");
+    Sound frogAudio = LoadSound("assets/audio/frog.wav");
+    Sound gameOverAudio = LoadSound("assets/audio/gameOver.wav");
 
     SetMusicVolume(themeSong, 0.5f);
 
@@ -303,6 +308,7 @@ int main()
     UnloadMusicStream(themeSong);
     UnloadSound(gameOverAudio);
     UnloadSound(frogAudio);
+    UnloadFrogTextures();
 
     CloseAudioDevice();
     CloseWindow();

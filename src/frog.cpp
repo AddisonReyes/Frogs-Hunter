@@ -1,6 +1,12 @@
 #include "frog.h"
 #include <raylib.h>
 
+Texture2D Frog::frog1Texture = {0};
+Texture2D Frog::frog2Texture = {0};
+Texture2D Frog::frog3Texture = {0};
+Texture2D Frog::lily_padTexture = {0};
+double Frog::speed = 0.6;
+
 Frog::Frog(float _x, float _y, float _width, float _height, int _score)
 {
     x = _x;
@@ -13,7 +19,21 @@ Frog::Frog(float _x, float _y, float _width, float _height, int _score)
     spriteLoaded = false;
 }
 
-double Frog::speed = 0.6;
+void InitFrogTextures()
+{
+    Frog::frog1Texture = LoadTexture("assets/sprites/frog1.png");
+    Frog::frog2Texture = LoadTexture("assets/sprites/frog2.png");
+    Frog::frog3Texture = LoadTexture("assets/sprites/frog3.png");
+    Frog::lily_padTexture = LoadTexture("assets/sprites/lily_pad.png");
+}
+
+void UnloadFrogTextures()
+{
+    UnloadTexture(Frog::frog1Texture);
+    UnloadTexture(Frog::frog2Texture);
+    UnloadTexture(Frog::frog3Texture);
+    UnloadTexture(Frog::lily_padTexture);
+}
 
 void Frog::draw()
 {
@@ -21,21 +41,21 @@ void Frog::draw()
     {
         if (!spriteLoaded)
         {
-            lilyPad = LoadTexture("src/assets/sprites/lily_pad.png");
+            lilyPad = lily_padTexture;
             // Color color;
             if (goldFrog)
             {
-                sprite = LoadTexture("src/assets/sprites/frog3.png");
+                sprite = frog3Texture;
                 // color = YELLOW;
             }
             else if (isFrog && !bullets)
             {
-                sprite = LoadTexture("src/assets/sprites/frog1.png");
+                sprite = frog1Texture;
                 // color = GREEN;
             }
             else if (bullets)
             {
-                sprite = LoadTexture("src/assets/sprites/frog2.png");
+                sprite = frog2Texture;
                 // color = BROWN;
             }
             else
