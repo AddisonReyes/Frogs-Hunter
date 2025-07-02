@@ -1,4 +1,5 @@
 
+#include "assets.h"
 #include "game.h"
 
 Game::Game(Player *_player, int numFrogs) : player(_player)
@@ -60,10 +61,10 @@ void Game::ResetGame()
 
 void Game::handleGameplayLogic(float deltaTime)
 {
-    if (!IsMusicStreamPlaying(themeSong))
+    if (!IsMusicStreamPlaying(Assets::themeSong))
     {
-        SeekMusicStream(themeSong, 0.0f);
-        PlayMusicStream(themeSong);
+        SeekMusicStream(Assets::themeSong, 0.0f);
+        PlayMusicStream(Assets::themeSong);
     }
 
     /*
@@ -87,7 +88,7 @@ void Game::handleGameplayLogic(float deltaTime)
     if (player->getMunition() <= 0)
     {
         currentGameState = GAMEOVER;
-        PlaySound(gameOverAudio);
+        PlaySound(Assets::gameOverAudio);
     }
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && player->getMunition() > 0)
@@ -143,7 +144,7 @@ void Game::handleGameplayLogic(float deltaTime)
                     player->kill();
                 }
 
-                PlaySound(frogAudio);
+                PlaySound(Assets::frogAudio);
                 break;
             }
         }
@@ -177,9 +178,9 @@ void Game::handleGameplayLogic(float deltaTime)
 
 void Game::handleGameOverLogic()
 {
-    if (IsMusicStreamPlaying(themeSong))
+    if (IsMusicStreamPlaying(Assets::themeSong))
     {
-        PauseMusicStream(themeSong);
+        PauseMusicStream(Assets::themeSong);
     }
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))

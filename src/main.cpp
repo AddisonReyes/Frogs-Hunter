@@ -1,28 +1,27 @@
-#include "game.h"
-
 #include <raylib.h>
 #include <iostream>
 #include <vector>
+
+#include "assets.h"
+#include "game.h"
+
+extern void UnloadAssets();
+extern void InitAssets();
 
 int main()
 {
     InitWindow(screenWidth, screenHeight, "Frogs Hunter!");
     InitAudioDevice();
     SetTargetFPS(60);
-
-    InitFrogTextures();
+    InitAssets();
 
     Player player(10);
     Game game(&player, 10);
 
-    SetMusicVolume(themeSong, 0.5f);
-    SetSoundVolume(gameOverAudio, 0.5f);
-    SetSoundVolume(frogAudio, 0.5f);
-
     while (!WindowShouldClose())
     {
         float deltaTime = GetFrameTime();
-        UpdateMusicStream(themeSong);
+        UpdateMusicStream(Assets::themeSong);
 
         BeginDrawing();
         ClearBackground(bkgColor);
@@ -42,10 +41,7 @@ int main()
         EndDrawing();
     }
 
-    UnloadMusicStream(themeSong);
-    UnloadSound(gameOverAudio);
-    UnloadSound(frogAudio);
-    UnloadFrogTextures();
+    UnloadAssets();
 
     CloseAudioDevice();
     CloseWindow();

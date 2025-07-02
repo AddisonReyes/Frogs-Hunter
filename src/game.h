@@ -4,15 +4,11 @@
 #include <vector>
 
 #include "player.h"
-#include "assets.h"
 #include "utils.h"
 #include "frog.h"
 
 #ifndef GAME_H
 #define GAME_H
-
-extern void UnloadFrogTextures();
-extern void InitFrogTextures();
 
 const Color bkgColor = {88, 225, 246, 255};
 const int screenHeight = 600;
