@@ -60,7 +60,8 @@
 		"cinttypes": "cpp",
 		"typeinfo": "cpp",
 		"variant": "cpp",
-		"*.m": "cpp"
+		"*.m": "cpp",
+		"raylib.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "disabled"
 }
