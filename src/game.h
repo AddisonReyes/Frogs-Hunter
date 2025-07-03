@@ -5,6 +5,7 @@
 
 #include "player.h"
 #include "utils.h"
+#include "item.h"
 #include "frog.h"
 
 #ifndef GAME_H
@@ -23,7 +24,9 @@ protected:
     Player *player;
     std::vector<FloatingText> floatingTexts;
     std::vector<Frog> frogs;
+    std::vector<Item> items;
     int numOfFrogs;
+    int numOfItems;
 
     Rectangle retryButton;
 
@@ -32,6 +35,7 @@ public:
     Game(Player *player, int numFrogs, Assets *assets);
 
     void spawnFrog(int bullets);
+    void spawnItem();
     void ResetGame();
 
     void handleGameplayLogic(float deltaTime);

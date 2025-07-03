@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include "assets.h"
 
 #ifndef FROG_H
 #define FROG_H
@@ -23,7 +24,7 @@ public:
     float x, y;
     int score;
 
-    Frog(float _x, float _y, float _width, float _height, int _score, Assets *assets);
+    Frog(float _x, float _y, float _width, float _height, int _score, Assets *_assets);
 
     void die(bool moreDificulty);
     void draw();

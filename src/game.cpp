@@ -6,9 +6,16 @@ Game::Game(Player *_player, int _numFrogs, Assets *_assets)
     : assets(_assets), player(_player), numOfFrogs(_numFrogs)
 {
     currentGameState = GAMEPLAY;
+    numOfItems = 2;
+
     for (int i = 0; i < numOfFrogs; i++)
     {
         spawnFrog(player->getMunition());
+    }
+
+    for (int i = 0; i < numOfItems; i++)
+    {
+        spawnItem();
     }
 
     retryButton = {(float)screenWidth / 2 - 130, (float)screenHeight / 2 + 50, 260, 60};
@@ -43,13 +50,22 @@ void Game::spawnFrog(int bullets)
     frogs.push_back(frog);
 }
 
+void Game::spawnItem()
+{
+    Item item(randomInRange(-100, -600), randomInRange(60, screenHeight - 120), 64, 64, assets);
+    items.push_back(item);
+}
+
 void Game::ResetGame()
 {
+    numOfItems = 0;
+
     player->setMunition(10);
     player->setScore(0);
     player->setFrogsKilled(0);
 
     frogs.clear();
+    items.clear();
     floatingTexts.clear();
     Frog::resetSpeed();
 
@@ -74,6 +90,16 @@ void Game::handleGameplayLogic(float deltaTime)
         {
             spawnFrog(player->getMunition());
             frog.die(false);
+        }
+    }
+
+    for (auto &item : items)
+    {
+        item.update();
+        if (item.x > screenWidth + item.width)
+        {
+            item.clear(false);
+            spawnItem();
         }
     }
 
@@ -113,19 +139,13 @@ void Game::handleGameplayLogic(float deltaTime)
                     textColor = GRAY;
                 }
 
-                floatingTexts.emplace_back(
-                    (Vector2){frog.x + frog.width / 2, frog.y + frog.height / 2},
-                    frog.score,
-                    textColor,
-                    1.5f);
+                Vector2 pos = (Vector2){frog.x + frog.width / 2, frog.y + frog.height / 2};
+                floatingTexts.emplace_back(pos, frog.score, textColor, 1.5f);
 
                 if (frog.bullets)
                 {
-                    floatingTexts.emplace_back(
-                        (Vector2){frog.x + frog.width / 2, (frog.y + frog.height / 2) - 20},
-                        5,
-                        BROWN,
-                        1.5f);
+                    Vector2 pos = (Vector2){frog.x + frog.width / 2, (frog.y + frog.height / 2) - 20};
+                    floatingTexts.emplace_back(pos, 5, BROWN, 1.5f);
                 }
 
                 player->shot(frog.score);
@@ -147,15 +167,27 @@ void Game::handleGameplayLogic(float deltaTime)
             }
         }
 
+        for (auto &item : items)
+        {
+            if (item.isActive() && CheckCollisionPointRec(mousePoint, item.getRect()))
+            {
+                hitSomething = true;
+
+                Vector2 pos = (Vector2){item.x + item.width / 2, item.y + item.height / 2};
+                floatingTexts.emplace_back(pos, 6, GREEN, 1.5f);
+                item.clear(true);
+                spawnItem();
+
+                // PlaySound(assets->frogAudio);
+                break;
+            }
+        }
+
         if (!hitSomething)
         {
             player->shot(-1);
             Vector2 mousePoint = GetMousePosition();
-            floatingTexts.emplace_back(
-                mousePoint,
-                -1,
-                GRAY,
-                1.5f);
+            floatingTexts.emplace_back(mousePoint, -1, GRAY, 1.5f);
         }
     }
 
@@ -197,6 +229,11 @@ void Game::handleGameplayGraphics()
     for (auto &frog : frogs)
     {
         frog.draw();
+    }
+
+    for (auto &item : items)
+    {
+        item.draw();
     }
 
     std::string scoreText = "Score: " + std::to_string(player->getScore());
