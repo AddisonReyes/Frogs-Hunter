@@ -8,15 +8,13 @@ class Frog
 protected:
     Texture2D sprite;
     Texture2D lilyPad;
+    Assets *assets;
+
     bool spriteLoaded;
     bool isFrog;
     bool active;
 
 public:
-    static Texture2D frog2Texture;
-    static Texture2D frog1Texture;
-    static Texture2D frog3Texture;
-    static Texture2D lily_padTexture;
     static double speed;
 
     float width, height;
@@ -25,7 +23,7 @@ public:
     float x, y;
     int score;
 
-    Frog(float _x, float _y, float _width, float _height, int _score);
+    Frog(float _x, float _y, float _width, float _height, int _score, Assets *assets);
 
     void die(bool moreDificulty);
     void draw();

@@ -1,11 +1,11 @@
 
+#include "assets.h"
 #include "game.h"
 
-Game::Game(Player *_player, int numFrogs) : player(_player)
+Game::Game(Player *_player, int _numFrogs, Assets *_assets)
+    : assets(_assets), player(_player), numOfFrogs(_numFrogs)
 {
     currentGameState = GAMEPLAY;
-    numOfFrogs = numFrogs;
-
     for (int i = 0; i < numOfFrogs; i++)
     {
         spawnFrog(player->getMunition());
@@ -16,7 +16,7 @@ Game::Game(Player *_player, int numFrogs) : player(_player)
 
 void Game::spawnFrog(int bullets)
 {
-    Frog frog(randomInRange(-100, -600), randomInRange(60, screenHeight - 120), 64, 64, 5);
+    Frog frog(randomInRange(-100, -600), randomInRange(60, screenHeight - 120), 64, 64, 5, assets);
     frog.goldFrog = false;
     frog.bullets = false;
 
@@ -52,6 +52,7 @@ void Game::ResetGame()
     frogs.clear();
     floatingTexts.clear();
     Frog::resetSpeed();
+
     for (int i = 0; i < numOfFrogs; i++)
     {
         spawnFrog(player->getMunition());
@@ -60,15 +61,12 @@ void Game::ResetGame()
 
 void Game::handleGameplayLogic(float deltaTime)
 {
-    if (!IsMusicStreamPlaying(themeSong))
+    if (!IsMusicStreamPlaying(assets->themeSong))
     {
-        SeekMusicStream(themeSong, 0.0f);
-        PlayMusicStream(themeSong);
+        SeekMusicStream(assets->themeSong, 0.0f);
+        PlayMusicStream(assets->themeSong);
     }
 
-    /*
-     * Update
-     */
     for (auto &frog : frogs)
     {
         frog.update();
@@ -87,7 +85,7 @@ void Game::handleGameplayLogic(float deltaTime)
     if (player->getMunition() <= 0)
     {
         currentGameState = GAMEOVER;
-        PlaySound(gameOverAudio);
+        PlaySound(assets->gameOverAudio);
     }
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && player->getMunition() > 0)
@@ -120,6 +118,7 @@ void Game::handleGameplayLogic(float deltaTime)
                     frog.score,
                     textColor,
                     1.5f);
+
                 if (frog.bullets)
                 {
                     floatingTexts.emplace_back(
@@ -143,7 +142,7 @@ void Game::handleGameplayLogic(float deltaTime)
                     player->kill();
                 }
 
-                PlaySound(frogAudio);
+                PlaySound(assets->frogAudio);
                 break;
             }
         }
@@ -177,9 +176,9 @@ void Game::handleGameplayLogic(float deltaTime)
 
 void Game::handleGameOverLogic()
 {
-    if (IsMusicStreamPlaying(themeSong))
+    if (IsMusicStreamPlaying(assets->themeSong))
     {
-        PauseMusicStream(themeSong);
+        PauseMusicStream(assets->themeSong);
     }
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
@@ -210,14 +209,14 @@ void Game::handleGameplayGraphics()
 
     DrawRectangle(0, 0, screenWidth, 50, BLACK);
     DrawRectangle(0, screenHeight - 50, screenWidth, 50, BLACK);
-    DrawText(scoreText.c_str(), scorePositionX, 10, fontSize, WHITE);
-    DrawText(bulletsText.c_str(), bulletsPositionX, screenHeight - fontSize - 10, fontSize, WHITE);
+    DrawTextEx(assets->customFont, scoreText.c_str(), (Vector2){(float)scorePositionX, 10.0f}, fontSize, 0, WHITE);
+    DrawTextEx(assets->customFont, bulletsText.c_str(), (Vector2){(float)bulletsPositionX, (float)(screenHeight - fontSize - 10)}, fontSize, 0, WHITE);
 
     for (auto &text : floatingTexts)
     {
         std::string valueStr = ((text.value > 0) ? "+" : "") + std::to_string(text.value);
         int textWidth = MeasureText(valueStr.c_str(), 20);
-        DrawText(valueStr.c_str(), text.position.x - textWidth / 2, text.position.y, 20, text.getCurrentColor());
+        DrawTextEx(assets->customFont, valueStr.c_str(), (Vector2){text.position.x - textWidth / 2, text.position.y}, 20, 0, text.getCurrentColor());
     }
 }
 
@@ -231,18 +230,20 @@ void Game::handleGameOverGraphics()
 
     const char *gameOverText = "GAME OVER!";
     int gameOverTextWidth = MeasureText(gameOverText, 60);
-    DrawText(gameOverText, (screenWidth / 2) - (gameOverTextWidth / 2), screenHeight / 2 - 100, 60, RED);
+    Vector2 gameOverTextPos = (Vector2){(float)((screenWidth / 2) - (gameOverTextWidth / 2)), (float)(screenHeight / 2 - 100)};
+    DrawTextEx(assets->customFont, gameOverText, gameOverTextPos, fontSize * 2, 0, RED);
 
     std::string finalScoreText = "Score: " + std::to_string(player->getScore());
     int finalScoreTextWidth = MeasureText(finalScoreText.c_str(), fontSize);
-    DrawText(finalScoreText.c_str(), (screenWidth / 2) - (finalScoreTextWidth / 2), screenHeight / 2 - 20, fontSize, WHITE);
+    Vector2 finalScoreTextPos = (Vector2){(float)((screenWidth / 2) - (finalScoreTextWidth / 2)), (float)(screenHeight / 2 - 20)};
+    DrawTextEx(assets->customFont, finalScoreText.c_str(), finalScoreTextPos, fontSize, 0, WHITE);
 
     std::string frogsKilledText = "Frogs: " + std::to_string(player->getFrogsKilled());
     int frogsKilledTextWidth = MeasureText(frogsKilledText.c_str(), fontSize);
-    DrawText(frogsKilledText.c_str(), (screenWidth / 2) - (frogsKilledTextWidth / 2), screenHeight / 2 + 10, fontSize, WHITE);
+    Vector2 frogsKilledTextPos = (Vector2){(float)((screenWidth / 2) - (frogsKilledTextWidth / 2)), (float)(screenHeight / 2 + 10)};
+    DrawTextEx(assets->customFont, frogsKilledText.c_str(), frogsKilledTextPos, fontSize, 0, WHITE);
 
     DrawRectangleRec(retryButton, Fade(GREEN, 0.2f));
-    DrawText(retryText, retryButton.x + (retryButton.width / 2) - (retryTextWidth / 2),
-             retryButton.y + (retryButton.height / 2) - (retryTextFontSize / 2),
-             retryTextFontSize, WHITE);
+    Vector2 retryButtonPos = (Vector2){retryButton.x + (retryButton.width / 2) - (retryTextWidth / 2), retryButton.y + (retryButton.height / 2) - (retryTextFontSize / 2)};
+    DrawTextEx(assets->customFont, retryText, retryButtonPos, retryTextFontSize, 0, WHITE);
 }

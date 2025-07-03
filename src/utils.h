@@ -3,6 +3,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+const Color bkgColor = {88, 225, 246, 255};
+const int screenHeight = 600;
+const int screenWidth = 800;
+const int fontSize = 32;
+
 struct FloatingText
 {
     Vector2 position;

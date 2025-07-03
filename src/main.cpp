@@ -1,8 +1,8 @@
-#include "game.h"
-
 #include <raylib.h>
 #include <iostream>
 #include <vector>
+
+#include "game.h"
 
 int main()
 {
@@ -10,19 +10,15 @@ int main()
     InitAudioDevice();
     SetTargetFPS(60);
 
-    InitFrogTextures();
-
-    Player player(10);
-    Game game(&player, 10);
-
-    SetMusicVolume(themeSong, 0.5f);
-    SetSoundVolume(gameOverAudio, 0.5f);
-    SetSoundVolume(frogAudio, 0.5f);
+    Assets assets;
+    int startBullets = 10;
+    Player player(startBullets);
+    Game game(&player, startBullets, &assets);
 
     while (!WindowShouldClose())
     {
         float deltaTime = GetFrameTime();
-        UpdateMusicStream(themeSong);
+        UpdateMusicStream(assets.themeSong);
 
         BeginDrawing();
         ClearBackground(bkgColor);
@@ -42,11 +38,7 @@ int main()
         EndDrawing();
     }
 
-    UnloadMusicStream(themeSong);
-    UnloadSound(gameOverAudio);
-    UnloadSound(frogAudio);
-    UnloadFrogTextures();
-
+    assets.UnloadAssets();
     CloseAudioDevice();
     CloseWindow();
     return 0;

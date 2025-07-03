@@ -11,14 +11,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-extern void UnloadFrogTextures();
-extern void InitFrogTextures();
-
-const Color bkgColor = {88, 225, 246, 255};
-const int screenHeight = 600;
-const int screenWidth = 800;
-const int fontSize = 32;
-
 enum GameState
 {
     GAMEPLAY,
@@ -28,6 +20,7 @@ enum GameState
 class Game
 {
 protected:
+    Assets *assets;
     Player *player;
     std::vector<FloatingText> floatingTexts;
     std::vector<Frog> frogs;
@@ -37,7 +30,7 @@ protected:
 
 public:
     GameState currentGameState;
-    Game(Player *player, int numFrogs);
+    Game(Player *player, int numFrogs, Assets *assets);
 
     void spawnFrog(int bullets);
     void ResetGame();

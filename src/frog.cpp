@@ -1,13 +1,8 @@
-#include "frog.h"
 #include <raylib.h>
+#include "assets.h"
+#include "frog.h"
 
-Texture2D Frog::frog1Texture = {0};
-Texture2D Frog::frog2Texture = {0};
-Texture2D Frog::frog3Texture = {0};
-Texture2D Frog::lily_padTexture = {0};
-double Frog::speed = 0.6;
-
-Frog::Frog(float _x, float _y, float _width, float _height, int _score)
+Frog::Frog(float _x, float _y, float _width, float _height, int _score, Assets *_assets)
 {
     x = _x;
     y = _y;
@@ -17,23 +12,10 @@ Frog::Frog(float _x, float _y, float _width, float _height, int _score)
     active = true;
     score = _score;
     spriteLoaded = false;
+    assets = _assets;
 }
 
-void InitFrogTextures()
-{
-    Frog::frog1Texture = LoadTexture("assets/sprites/frog1.png");
-    Frog::frog2Texture = LoadTexture("assets/sprites/frog2.png");
-    Frog::frog3Texture = LoadTexture("assets/sprites/frog3.png");
-    Frog::lily_padTexture = LoadTexture("assets/sprites/lily_pad.png");
-}
-
-void UnloadFrogTextures()
-{
-    UnloadTexture(Frog::frog1Texture);
-    UnloadTexture(Frog::frog2Texture);
-    UnloadTexture(Frog::frog3Texture);
-    UnloadTexture(Frog::lily_padTexture);
-}
+double Frog::speed = 0.6;
 
 void Frog::draw()
 {
@@ -41,29 +23,22 @@ void Frog::draw()
     {
         if (!spriteLoaded)
         {
-            lilyPad = lily_padTexture;
-            // Color color;
+            lilyPad = assets->lilyPadTexture;
+
             if (goldFrog)
             {
-                sprite = frog3Texture;
-                // color = YELLOW;
+                sprite = assets->frog3Texture;
             }
             else if (isFrog && !bullets)
             {
-                sprite = frog1Texture;
-                // color = GREEN;
+                sprite = assets->frog1Texture;
             }
             else if (bullets)
             {
-                sprite = frog2Texture;
-                // color = BROWN;
+                sprite = assets->frog2Texture;
             }
-            else
-            {
-                // color = GRAY;
-            }
+
             spriteLoaded = true;
-            // DrawRectangle(x, y, width, height, color);
         }
         DrawTexture(lilyPad, x, y + 10, WHITE);
         DrawTexture(sprite, x, y, WHITE);
