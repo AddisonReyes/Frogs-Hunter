@@ -6,24 +6,25 @@ Game::Game(Player *_player, int _numFrogs, Assets *_assets)
     : assets(_assets), player(_player), numOfFrogs(_numFrogs)
 {
     currentGameState = GAMEPLAY;
-    numOfItems = 2;
+    numOfItems = 0;
 
     for (int i = 0; i < numOfFrogs; i++)
     {
         spawnFrog(player->getMunition());
     }
 
-    for (int i = 0; i < numOfItems; i++)
-    {
-        spawnItem();
-    }
+    // for (int i = 0; i < numOfItems; i++)
+    // {
+    //     spawnItem();
+    // }
 
     retryButton = {(float)screenWidth / 2 - 130, (float)screenHeight / 2 + 50, 260, 60};
 }
 
 void Game::spawnFrog(int bullets)
 {
-    Frog frog(randomInRange(-100, -600), randomInRange(60, screenHeight - 120), 64, 64, 5, assets);
+    Frog frog(randomInRange(-100, -600), randomInRange(80, screenHeight - 160), 64, 64, 5, assets);
+    frog.extraSpeed = randomInRange(-0.6, 0.6);
     frog.goldFrog = false;
     frog.bullets = false;
 
@@ -52,7 +53,7 @@ void Game::spawnFrog(int bullets)
 
 void Game::spawnItem()
 {
-    Item item(randomInRange(-100, -600), randomInRange(60, screenHeight - 120), 64, 64, assets);
+    Item item(randomInRange(-100, -600), randomInRange(80, screenHeight - 160), 64, 64, assets);
     items.push_back(item);
 }
 
@@ -198,6 +199,13 @@ void Game::handleGameplayLogic(float deltaTime)
             { return !frog.isActive(); }),
         frogs.end());
 
+    items.erase(
+        std::remove_if(
+            items.begin(),
+            items.end(), [](const Item &item)
+            { return !item.isActive(); }),
+        items.end());
+
     floatingTexts.erase(
         std::remove_if(
             floatingTexts.begin(),
@@ -226,15 +234,22 @@ void Game::handleGameOverLogic()
 
 void Game::handleGameplayGraphics()
 {
+    std::vector<DrawInfo> all;
     for (auto &frog : frogs)
-    {
-        frog.draw();
-    }
+        all.push_back({frog.y, [&frog]()
+                       { frog.draw(); }});
 
     for (auto &item : items)
-    {
-        item.draw();
-    }
+        all.push_back({item.y, [&item]()
+                       { item.draw(); }});
+
+    std::sort(all.begin(), all.end(),
+              [](const DrawInfo &a, const DrawInfo &b)
+              { return a.y < b.y; });
+
+    for (auto &obj : all)
+        obj.drawFunc();
+    all.clear();
 
     std::string scoreText = "Score: " + std::to_string(player->getScore());
     int scoreTextWidth = MeasureText(scoreText.c_str(), fontSize);

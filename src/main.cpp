@@ -11,9 +11,10 @@ int main()
     SetTargetFPS(60);
 
     Assets assets;
+    int nomOfFrogs = 10;
     int startBullets = 10;
     Player player(startBullets);
-    Game game(&player, startBullets, &assets);
+    Game game(&player, nomOfFrogs, &assets);
 
     while (!WindowShouldClose())
     {

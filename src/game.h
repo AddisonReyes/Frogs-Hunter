@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <raylib.h>
 #include <iostream>
+#include <functional>
 #include <vector>
 
 #include "player.h"
@@ -42,6 +43,12 @@ public:
     void handleGameOverLogic();
     void handleGameplayGraphics();
     void handleGameOverGraphics();
+};
+
+struct DrawInfo
+{
+    float y;
+    std::function<void()> drawFunc;
 };
 
 #endif

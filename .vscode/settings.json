@@ -61,7 +61,11 @@
 		"typeinfo": "cpp",
 		"variant": "cpp",
 		"*.m": "cpp",
-		"raylib.h": "c"
+		"raylib.h": "c",
+		"chrono": "cpp",
+		"ratio": "cpp",
+		"iomanip": "cpp",
+		"sstream": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "disabled"
 }

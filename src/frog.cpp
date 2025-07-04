@@ -13,6 +13,7 @@ Frog::Frog(float _x, float _y, float _width, float _height, int _score, Assets *
     score = _score;
     spriteLoaded = false;
     assets = _assets;
+    extraSpeed = 0;
 }
 
 double Frog::speed = 0.6;
@@ -47,7 +48,7 @@ void Frog::draw()
 
 void Frog::update()
 {
-    x += speed;
+    x += speed + extraSpeed;
 }
 
 void Frog::moreSpeed()

@@ -17,6 +17,7 @@ protected:
 
 public:
     static double speed;
+    double extraSpeed;
 
     float width, height;
     bool goldFrog;
